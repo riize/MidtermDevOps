@@ -1,0 +1,89 @@
+<html>
+
+<head>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+    <script src="https://sdk.amazonaws.com/js/aws-sdk-2.0.0-rc11.min.js"></script>
+    <script type="text/javascript">
+    // See the Configuring section to configure credentials in the SDK
+    AWS.config.update({
+        accessKeyId: 'AKIAI3SKUI2YZRK7B3SA',
+        secretAccessKey: 'Broz8XT2d5hCNiY8WheLJzaHUYybscmsUg0LPFXC',
+        region: 'us-east-1'
+    });
+
+    // Configure your region
+    // AWS.config.region = ";
+    </script>
+</head>
+
+<body>
+<center>
+
+<h1 style="background-color:FFCCFF">Upload File</h1>
+
+    <input type="file" id="file-chooser" />
+    <button id="upload-button"  class="btn btn-info">Upload</button>
+    <div id="results"></div>
+    </center>
+    <script type="text/javascript">
+    /*global AWS*/
+	var s3BucketName = 'srisopa'
+	var bucket = new AWS.S3({
+	  params: {
+	    Bucket: s3BucketName
+	  }
+	}) // BucketName
+	var fileChooser = document.getElementById('file-chooser')
+	var button = document.getElementById('upload-button')
+	var results = document.getElementById('results')
+	button.addEventListener('click', function () {
+	  var file = fileChooser.files[0]
+	  if (file) {
+	    results.innerHTML = ''
+
+	    var params = {
+	      Key: file.name,
+	      ContentType: file.type,
+	      Body: file
+	    }
+	    bucket.putObject(params, function (err, data) {
+	      if (err) {
+	        results.innerHTML = err
+	      } else {
+	        results.innerHTML = 'UPLOADED.'
+	        window.location.assign("UploadFile.html")
+	      }
+	    })
+	  } else {
+	    results.innerHTML = 'Nothing to upload.>'
+	  }
+	}, false)
+    </script>
+    <hr>
+    <div id="status"></div>
+    <ul id="objects"></ul>
+    <script type="text/javascript">
+    /*global AWS*/
+	var bucket = new AWS.S3({
+	  params: {
+	    Bucket: s3BucketName
+	  }
+	}) // BucketName
+	bucket.listObjects(function (err, data) {
+	  if (err) {
+	    document.getElementById('status').innerHTML = 'Could not load objects from S3'
+	  } else {
+	    document.getElementById('status').innerHTML = '<h2>Files in your S3</h2>'
+	    for (var i = 0; i < data.Contents.length; i++) {
+	      console.log(data.Name)
+	      // document.getElementById('objects').innerHTML +='<li>' + data.Contents[i].Key + "<img src='https://s3-ap-northeast-1.amazonaws.com/"+data.Name+"/"+data.Contents[i].Key+"'/>" + '</li>'
+	      document.getElementById('objects').innerHTML += ''  + '<h4><ins>'+data.Contents[i].Key + '</ins></h4>' 
+	    }
+	  }
+	})
+
+    </script>
+  
+</body>
+
+</html>
